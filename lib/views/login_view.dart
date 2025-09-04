@@ -1,7 +1,15 @@
+import 'package:aplikasi_5simia1_mobile3/controllers/login_controller.dart';
 import 'package:flutter/material.dart';
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
   const LoginView({super.key});
+
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
+  final loginController = LoginController();
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +38,7 @@ class LoginView extends StatelessWidget {
                 // 3. Inputan Username,
                 const SizedBox(height: 12),
                 TextFormField(
+                  controller: loginController.usernameController,
                   decoration: InputDecoration(
                     hintText: "Username",
                     prefixIcon: Icon(Icons.person),
@@ -42,11 +51,23 @@ class LoginView extends StatelessWidget {
                 // 4. Inputan Password,
                 const SizedBox(height: 12),
                 TextFormField(
-                  obscureText: true,
+                  controller: loginController.passwordController,
+                  obscureText: !loginController.isVisible,
                   decoration: InputDecoration(
                     hintText: "Password",
                     prefixIcon: Icon(Icons.key),
-                    suffixIcon: Icon(Icons.visibility),
+                    suffixIcon: InkWell(
+                      onTap: () {
+                        setState(() {
+                          loginController.tampilkanPassword();
+                        });
+                      },
+                      child: Icon(
+                        loginController.isVisible
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                    ),
                     fillColor: Colors.grey.shade300,
                     filled: true,
                     border: InputBorder.none,
