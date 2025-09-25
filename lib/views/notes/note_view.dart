@@ -1,4 +1,5 @@
 import 'package:aplikasi_5simia1_mobile3/views/login_view.dart';
+import 'package:aplikasi_5simia1_mobile3/views/notes/create_note_view.dart';
 import 'package:flutter/material.dart';
 
 class NoteView extends StatelessWidget {
@@ -31,7 +32,14 @@ class NoteView extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CreateNoteView(),
+            ),
+          );
+        },
         child: const Icon(Icons.add),
       ),
       body: Padding(

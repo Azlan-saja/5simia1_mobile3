@@ -1,18 +1,13 @@
 import 'package:aplikasi_5simia1_mobile3/database/database_helper.dart';
-import 'package:aplikasi_5simia1_mobile3/models/user_model.dart';
+import 'package:aplikasi_5simia1_mobile3/models/note_model.dart';
 import 'package:aplikasi_5simia1_mobile3/views/notes/note_view.dart';
 import 'package:flutter/material.dart';
 
-class LoginController {
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
-  bool isVisible = false;
+class NoteController {
+  final titleController = TextEditingController();
+  final contentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   final db = DatabaseHelper();
-
-  tampilkanPassword() {
-    isVisible = !isVisible;
-  }
 
   String? cekValidasi(String? value) {
     if (value!.isEmpty) {
@@ -21,37 +16,39 @@ class LoginController {
     return null;
   }
 
-  prosesLogin(BuildContext context) async {
+  Future prosesCreateData(BuildContext context) async {
     if (!formKey.currentState!.validate()) return;
 
     try {
-      var response = await db.login(
-        UserModel(
-          userName: usernameController.text,
-          userPassword: passwordController.text,
+      int result = await db.createNote(
+        NoteModel(
+          noteTitle: titleController.text,
+          noteContent: contentController.text,
+          createdAt: DateTime.now().toIso8601String(),
         ),
       );
 
       if (!context.mounted) return;
 
-      if (response == true) {
+      if (result > 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Login success'),
+            content: const Text('Note created successfully!'),
             backgroundColor: Colors.teal[400],
             behavior: SnackBarBehavior.floating,
           ),
         );
+
+        // Navigasi ke halaman Notes
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => NoteView(),
-            ));
+          context,
+          MaterialPageRoute(builder: (context) => const NoteView()),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Login failed! Please try again.'),
-            backgroundColor: Colors.red,
+            content: Text('Failed to create note. Please try again.'),
+            backgroundColor: Colors.redAccent,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -60,9 +57,9 @@ class LoginController {
       if (!context.mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(' Login failed! Please try again.'),
-          backgroundColor: Colors.red,
+        const SnackBar(
+          content: Text('An error occurred while creating the note.'),
+          backgroundColor: Colors.redAccent,
           behavior: SnackBarBehavior.floating,
         ),
       );
