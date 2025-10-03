@@ -1,12 +1,18 @@
+import 'package:aplikasi_5simia1_mobile3/controllers/note_controller.dart';
+import 'package:aplikasi_5simia1_mobile3/models/note_model.dart';
 import 'package:aplikasi_5simia1_mobile3/views/login_view.dart';
 import 'package:aplikasi_5simia1_mobile3/views/notes/create_note_view.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class NoteView extends StatelessWidget {
   const NoteView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final noteController = NoteController();
+    noteController.tampilkanData();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.teal,
@@ -46,7 +52,7 @@ class NoteView extends StatelessWidget {
         padding: EdgeInsetsGeometry.all(15),
         child: Column(
           children: [
-            // textfield pencarian
+            // 1. textfield pencarian
             TextFormField(
               decoration: InputDecoration(
                 hintText: "Cari Note Disini,",
@@ -55,6 +61,52 @@ class NoteView extends StatelessWidget {
                 filled: true,
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.only(top: 13),
+              ),
+            ),
+            // 2. TampilkanData Notes
+            Expanded(
+              child: FutureBuilder<List<NoteModel>>(
+                future: noteController.notes,
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<NoteModel>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("Note Kosong"));
+                  } else {
+                    final items = snapshot.data!;
+                    return ListView.separated(
+                      separatorBuilder: (context, index) => Divider(
+                        color: Colors.teal.shade100,
+                      ),
+                      itemCount: items.length,
+                      padding: const EdgeInsets.all(8),
+                      itemBuilder: (context, index) {
+                        final note = items[index];
+                        return ListTile(
+                          tileColor: Colors.teal.shade100,
+                          textColor: Colors.teal.shade900,
+                          splashColor: Colors.teal,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 6),
+                          title: Text(
+                            note.noteTitle,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          subtitle: Text(
+                            '${note.noteContent}\n\n${DateFormat("yMMMd").format(DateTime.parse(note.createdAt))}',
+                          ),
+                          onTap: () {
+                            // Navigasi ke halaman lihat/update note
+                          },
+                        );
+                      },
+                    );
+                  }
+                },
               ),
             ),
           ],

@@ -9,6 +9,9 @@ class NoteController {
   final formKey = GlobalKey<FormState>();
   final db = DatabaseHelper();
 
+  late DatabaseHelper handler;
+  late Future<List<NoteModel>> notes;
+
   String? cekValidasi(String? value) {
     if (value!.isEmpty) {
       return 'Tidak boleh kosong!';
@@ -64,5 +67,10 @@ class NoteController {
         ),
       );
     }
+  }
+
+  tampilkanData() {
+    handler = DatabaseHelper();
+    notes = handler.getNotes();
   }
 }
