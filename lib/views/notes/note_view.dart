@@ -6,14 +6,24 @@ import 'package:aplikasi_5simia1_mobile3/views/notes/update_note_view.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class NoteView extends StatelessWidget {
+class NoteView extends StatefulWidget {
   const NoteView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final noteController = NoteController();
-    noteController.tampilkanData();
+  State<NoteView> createState() => _NoteViewState();
+}
 
+class _NoteViewState extends State<NoteView> {
+  final noteController = NoteController();
+
+  @override
+  void initState() {
+    super.initState();
+    noteController.tampilkanData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.teal,
@@ -55,6 +65,11 @@ class NoteView extends StatelessWidget {
           children: [
             // 1. textfield pencarian
             TextFormField(
+              controller: noteController.searchController,
+              onChanged: (_) async {
+                await noteController.tampilkanData();
+                setState(() {});
+              },
               decoration: InputDecoration(
                 hintText: "Cari Note Disini,",
                 prefixIcon: Icon(Icons.search),
@@ -87,6 +102,41 @@ class NoteView extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final note = items[index];
                         return ListTile(
+                          trailing: IconButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Delete Note?'),
+                                  content: const Text(
+                                      'Are you sure you want to delete this note?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        await noteController.prosesDeleteData(
+                                          context,
+                                          noteId: note.noteId!,
+                                        );
+                                        setState(() {});
+                                      },
+                                      child: const Text(
+                                        'Delete',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.redAccent,
+                            ),
+                          ),
                           tileColor: Colors.teal.shade100,
                           textColor: Colors.teal.shade900,
                           splashColor: Colors.teal,

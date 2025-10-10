@@ -12,6 +12,8 @@ class NoteController {
   late DatabaseHelper handler;
   late Future<List<NoteModel>> notes;
 
+  final searchController = TextEditingController();
+
   String? cekValidasi(String? value) {
     if (value!.isEmpty) {
       return 'Tidak boleh kosong!';
@@ -118,7 +120,36 @@ class NoteController {
   }
 
   tampilkanData() {
-    handler = DatabaseHelper();
-    notes = handler.getNotes();
+    if (searchController.text.isNotEmpty) {
+      notes = handler.searchNotes(searchController.text);
+    } else {
+      handler = DatabaseHelper();
+      notes = handler.getNotes();
+    }
+  }
+
+  Future prosesDeleteData(BuildContext context, {required int noteId}) async {
+    Navigator.pop(context);
+    int result = await handler.deleteNote(noteId);
+    if (!context.mounted) return;
+
+    if (result > 0) {
+      notes = handler.getNotes();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Note deleted successfully!'),
+          backgroundColor: Colors.teal[400],
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to delete note. Please try again.'),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 }
